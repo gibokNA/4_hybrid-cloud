@@ -1,0 +1,21 @@
+# .gitignore
+
+*.tfstate
+*.tfstate.*
+
+# Terraform Configuration
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+
+# Crash Logs
+crash.log
+
+# IDE Settings
+.vscode/
+.idea/
+
+# Sensitive Data (혹시 모를 키 파일)
+*.pem
+*.key
+*.ovpn
