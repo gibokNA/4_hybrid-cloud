@@ -16,3 +16,17 @@ module "vpc" {
   public_subnets  = ["10.0.1.0/24", "10.0.2.0/24"]
   private_subnets = ["10.0.10.0/24", "10.0.11.0/24"]
 }
+
+# VPN 모듈 추가
+module "vpn" {
+  source = "../../modules/aws/vpn"
+
+  name        = "hybrid-fin"
+  vpc_id      = module.vpc.vpc_id
+  
+  public_route_table_id  = module.vpc.public_route_table_id
+  private_route_table_id = module.vpc.private_route_table_id
+
+  customer_asn = 65000  # 온프레미스 ASN
+  customer_ip  = "1.224.39.56" # 내 집 공유기 ip 주소
+}
