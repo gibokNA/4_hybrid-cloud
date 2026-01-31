@@ -10,15 +10,10 @@ data "vsphere_datastore" "ds" {
   datacenter_id = data.vsphere_datacenter.dc.id
 }
 
-# 2. 컴퓨트 클러스터 생성
-resource "vsphere_compute_cluster" "cluster" {
-  name            = "Prod-Cluster"
-  
-  # resource.dc.id 가 아니라 data.dc.id 를 참조.
-  datacenter_id   = data.vsphere_datacenter.dc.id
-  
-  ha_enabled          = false
-  drs_enabled         = false
+# 2. 컴퓨트 클러스터 조회 (Create X, Read O)
+data "vsphere_compute_cluster" "cluster" {
+  name          = "Prod-Cluster"
+  datacenter_id = data.vsphere_datacenter.dc.id
 }
 
 # 3. 리소스 풀 생성. 이거 쓸려면 DRS 켜져있어야함. 그런데 지금 실습규모에서는 굳이 필요없음.
@@ -40,7 +35,7 @@ module "db_master" {
   name             = "db-master"
   template_name    = "Ubuntu-22.04-Template"
   datacenter_id    = data.vsphere_datacenter.dc.id
-  resource_pool_id = vsphere_compute_cluster.cluster.resource_pool_id
+  resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
   network_id       = data.vsphere_network.service_net.id
   
   ip_address       = "172.16.20.11" # Service망 IP
@@ -56,7 +51,7 @@ module "db_slave" {
   name             = "db-slave"
   template_name    = "Ubuntu-22.04-Template"
   datacenter_id    = data.vsphere_datacenter.dc.id
-  resource_pool_id = vsphere_compute_cluster.cluster.resource_pool_id
+  resource_pool_id = data.vsphere_compute_cluster.cluster.resource_pool_id
   network_id       = data.vsphere_network.service_net.id
   
   ip_address       = "172.16.20.12"
