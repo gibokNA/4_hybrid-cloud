@@ -21,11 +21,11 @@ resource "vsphere_compute_cluster" "cluster" {
   drs_enabled         = false
 }
 
-# 3. 리소스 풀 생성
-resource "vsphere_resource_pool" "rp_service" {
-  name                    = "Service-Pool"
-  parent_resource_pool_id = vsphere_compute_cluster.cluster.resource_pool_id
-}
+# 3. 리소스 풀 생성. 이거 쓸려면 DRS 켜져있어야함. 그런데 지금 실습규모에서는 굳이 필요없음.
+#resource "vsphere_resource_pool" "rp_service" {
+#  name                    = "Service-Pool"
+#  parent_resource_pool_id = vsphere_compute_cluster.cluster.resource_pool_id
+#}
 
 # 4. 네트워크 정보 가져오기 (Service 망)
 data "vsphere_network" "service_net" {
@@ -40,7 +40,7 @@ module "db_master" {
   name             = "db-master"
   template_name    = "Ubuntu-22.04-Template"
   datacenter_id    = data.vsphere_datacenter.dc.id
-  resource_pool_id = vsphere_resource_pool.rp_service.id
+  resource_pool_id = vsphere_compute_cluster.cluster.resource_pool_id
   network_id       = data.vsphere_network.service_net.id
   
   ip_address       = "172.16.20.11" # Service망 IP
@@ -56,7 +56,7 @@ module "db_slave" {
   name             = "db-slave"
   template_name    = "Ubuntu-22.04-Template"
   datacenter_id    = data.vsphere_datacenter.dc.id
-  resource_pool_id = vsphere_resource_pool.rp_service.id
+  resource_pool_id = vsphere_compute_cluster.cluster.resource_pool_id
   network_id       = data.vsphere_network.service_net.id
   
   ip_address       = "172.16.20.12"
